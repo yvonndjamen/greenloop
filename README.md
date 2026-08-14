@@ -13,7 +13,7 @@ already has an admin panel for orders or inventory.
 
 ### 1. Clone the repository
 ```bash
-git clone <repository-url>
+git clone https://github.com/yvonndjamen/greenloop.git
 cd greenloop
 ```
 
