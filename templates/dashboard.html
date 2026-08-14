@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GreenLoop - Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand"><h2>GreenLoop</h2></div>
+            <div class="nav-user">
+                <span>Welcome, <strong>{{ current_user }}</strong></span>
+                <a href="{{ url_for('logout') }}" class="btn btn-secondary">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1>Dashboard</h1>
+            <p>Monitor your reusable packaging network and environmental impact</p>
+        </div>
+
+        <section class="kpi-section">
+            <h2>Key Metrics</h2>
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-icon">📦</div>
+                    <div class="kpi-content">
+                        <h3>Total Packages</h3>
+                        <div class="kpi-value">{{ metrics.total }}</div>
+                        <p class="kpi-label">All tracked packages</p>
+                    </div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-icon">🚚</div>
+                    <div class="kpi-content">
+                        <h3>Currently Shipped</h3>
+                        <div class="kpi-value">{{ metrics.shipped }}</div>
+                        <p class="kpi-label">In transit or delivery</p>
+                    </div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-icon">↩️</div>
+                    <div class="kpi-content">
+                        <h3>Returned Packages</h3>
+                        <div class="kpi-value">{{ metrics.returned }}</div>
+                        <p class="kpi-label">Back in inventory</p>
+                    </div>
+                </div>
+
+                <div class="kpi-card kpi-card-highlight">
+                    <div class="kpi-icon">🌍</div>
+                    <div class="kpi-content">
+                        <h3>CO₂ Saved</h3>
+                        <div class="kpi-value">{{ metrics.co2_saved }} <span class="kpi-unit">kg</span></div>
+                        <p class="kpi-label">Through reuse cycle</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="status-section">
+            <h2>Package Status Distribution</h2>
+            <div class="status-breakdown">
+                <div class="status-item">
+                    <div class="status-bar shipped">
+                        <span class="status-label">Shipped</span>
+                        <span class="status-count">{{ metrics.shipped }}</span>
+                    </div>
+                </div>
+                <div class="status-item">
+                    <div class="status-bar returned">
+                        <span class="status-label">Returned</span>
+                        <span class="status-count">{{ metrics.returned }}</span>
+                    </div>
+                </div>
+                <div class="status-item">
+                    <div class="status-bar in-circulation">
+                        <span class="status-label">In Circulation</span>
+                        <span class="status-count">{{ metrics.in_circulation }}</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="packages-section">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="margin: 0;">All Packages</h2>
+                <a href="{{ url_for('export_csv') }}" class="btn btn-secondary btn-small">📥 Export CSV</a>
+            </div>
+
+            <div class="search-bar">
+                <input type="text" id="search-input" placeholder="Search package ID..." />
+            </div>
+
+            <div id="packages-table-container">
+                <p style="text-align: center; color: var(--text-light);">Loading packages...</p>
+            </div>
+        </section>
+
+        <section class="activity-section">
+            <h2>Recent Activity</h2>
+            {% if recent_events %}
+            <div class="activity-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Package ID</th>
+                            <th>Event</th>
+                            <th>Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for event in recent_events %}
+                        <tr>
+                            <td><strong>{{ event.package_id }}</strong></td>
+                            <td>
+                                {% if event.status == 'shipped' %}
+                                    <span class="badge badge-shipped">🚚 Shipped</span>
+                                {% elif event.status == 'returned' %}
+                                    <span class="badge badge-returned">↩️ Returned</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ event.timestamp }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state"><p>No activity yet. Start scanning packages!</p></div>
+            {% endif %}
+        </section>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2024 GreenLoop - Sustainable Packaging Tracking.</p>
+    </footer>
+
+    <script>
+        // Load and display packages
+        async function loadPackages() {
+            try {
+                const response = await fetch('{{ url_for("api_packages") }}');
+                const packages = await response.json();
+
+                const container = document.getElementById('packages-table-container');
+                const packages_array = Object.values(packages).sort((a, b) => a.id.localeCompare(b.id));
+
+                if (packages_array.length === 0) {
+                    container.innerHTML = '<p style="text-align: center; color: var(--text-light);">No packages yet.</p>';
+                    return;
+                }
+
+                let html = '<table><thead><tr><th>Package ID</th><th>Created</th><th>Status</th><th>Last Updated</th><th>Events</th><th>Action</th></tr></thead><tbody>';
+
+                packages_array.forEach(pkg => {
+                    const status = pkg.current_status;
+                    const statusClass = status.replace('_', '-');
+                    const lastUpdate = pkg.history && pkg.history.length > 0 ? pkg.history[pkg.history.length - 1].timestamp : 'N/A';
+
+                    html += `<tr>
+                        <td><strong>${pkg.id}</strong></td>
+                        <td>${pkg.created_at.split('T')[0]}</td>
+                        <td><span class="status-badge status-${statusClass}">${status.toUpperCase()}</span></td>
+                        <td>${lastUpdate.split('T')[1] ? lastUpdate.split('T')[1].substring(0, 5) : 'N/A'}</td>
+                        <td>${pkg.history ? pkg.history.length : 0}</td>
+                        <td><a href="/package/${pkg.id}" class="btn btn-secondary btn-small">View</a></td>
+                    </tr>`;
+                });
+
+                html += '</tbody></table>';
+                container.innerHTML = html;
+                window.allPackages = packages_array;
+            } catch (error) {
+                console.error('Error loading packages:', error);
+                document.getElementById('packages-table-container').innerHTML = '<p style="color: red;">Error loading packages</p>';
+            }
+        }
+
+        // Search functionality
+        document.getElementById('search-input').addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('#packages-table-container tbody tr');
+
+            rows.forEach(row => {
+                const packageId = row.querySelector('td strong').textContent.toLowerCase();
+                row.style.display = packageId.includes(query) ? '' : 'none';
+            });
+        });
+
+        // Load packages on page load
+        loadPackages();
+    </script>
+

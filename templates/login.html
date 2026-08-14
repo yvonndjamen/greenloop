@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GreenLoop - Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <h1>GreenLoop</h1>
+                <p>Reusable Packaging Tracking</p>
+            </div>
+
+            <form method="POST" class="login-form" id="login-form">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" required placeholder="Enter your username">
+                    <small id="username-error" style="color: #e74c3c; display: none;">Username cannot be empty</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required placeholder="Enter your password">
+                    <small id="password-error" style="color: #e74c3c; display: none;">Password cannot be empty</small>
+                </div>
+
+                {% if error %}
+                <div class="error-message">
+                    ⚠️ {{ error }}
+                </div>
+                {% endif %}
+
+                <button type="submit" class="btn btn-primary btn-block">Login</button>
+            </form>
+
+            <script>
+                document.getElementById('login-form').addEventListener('submit', (e) => {
+                    const username = document.getElementById('username');
+                    const password = document.getElementById('password');
+                    let valid = true;
+
+                    if (!username.value.trim()) {
+                        document.getElementById('username-error').style.display = 'block';
+                        valid = false;
+                    } else {
+                        document.getElementById('username-error').style.display = 'none';
+                    }
+
+                    if (!password.value) {
+                        document.getElementById('password-error').style.display = 'block';
+                        valid = false;
+                    } else {
+                        document.getElementById('password-error').style.display = 'none';
+                    }
+
+                    if (!valid) e.preventDefault();
+                });
+            </script>
+
+            <div class="demo-info">
+                <h3>Demo Credentials:</h3>
+                <p><strong>Username:</strong> demo</p>
+                <p><strong>Password:</strong> demo123</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

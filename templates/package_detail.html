@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GreenLoop - Package Details</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <h2>GreenLoop</h2>
+            </div>
+            <div class="nav-user">
+                <span>Logged in as: <strong>{{ current_user }}</strong></span>
+                <a href="{{ url_for('logout') }}" class="btn btn-secondary btn-small">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Breadcrumb -->
+        <div class="breadcrumb">
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <span>/</span>
+            <span>Package Details</span>
+        </div>
+
+        {% if error %}
+        <div class="error-box">
+            <strong>Error:</strong> {{ error }}
+        </div>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-primary">Back to Dashboard</a>
+        {% else %}
+
+        <!-- Package Header with Action Button -->
+        <div class="detail-header">
+            <div class="detail-info">
+                <h1>{{ package.id }}</h1>
+                <div class="created-at">
+                    Created: {{ package.created_at }}
+                </div>
+                <div style="margin-top: 20px;">
+                    <strong>Current Status:</strong>
+                    <div style="margin-top: 10px;">
+                        {% if package.current_status == 'shipped' %}
+                            <span class="status-badge status-shipped">SHIPPED</span>
+                        {% elif package.current_status == 'returned' %}
+                            <span class="status-badge status-returned">RETURNED</span>
+                        {% else %}
+                            <span class="status-badge status-in-circulation">IN CIRCULATION</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="action-container">
+                <h3 style="margin-top: 0;">Quick Action</h3>
+                {% if package.current_status == 'in_circulation' %}
+                    <button class="btn btn-primary btn-action" onclick="updateStatus('{{ package.id }}')">
+                        Mark as Shipped
+                    </button>
+                    <p class="action-hint">Scans QR code when shipped out</p>
+                {% elif package.current_status == 'shipped' %}
+                    <button class="btn btn-primary btn-action" onclick="updateStatus('{{ package.id }}')">
+                        Mark as Returned
+                    </button>
+                    <p class="action-hint">Scans QR code when returned</p>
+                {% else %}
+                    <button class="btn btn-primary btn-action" disabled>
+                        No Actions Available
+                    </button>
+                    <p class="action-hint">Package is returned and complete</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- POC Explanation -->
+        <div style="background: #e8f4f8; border-left: 4px solid #3498db; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+            <strong>Note - Proof of Concept:</strong>
+            <p style="margin: 10px 0 0 0; font-size: 0.95em; color: var(--text-dark);">
+                This demo is running locally, so we use buttons to simulate package scanning. In production,
+                the behavior would be identical but triggered by scanning the QR code with a phone camera instead.
+                Each status change represents a QR scan event at different points in the logistics workflow.
+            </p>
+        </div>
+
+        <!-- Lifecycle Timeline -->
+        <div class="timeline">
+            <h2>Package Lifecycle</h2>
+            {% if package.history %}
+                {% for event in package.history %}
+                <div class="timeline-item {{ event.status }}">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-status">
+                            {% if event.status == 'shipped' %}
+                                📦 Shipped
+                            {% elif event.status == 'returned' %}
+                                ↩️ Returned
+                            {% endif %}
+                        </div>
+                        <div class="timeline-time">
+                            {{ event.timestamp }}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p style="color: var(--text-light); font-size: 0.95em;">
+                    No events yet. Scan the QR code to record the first status update.
+                </p>
+            {% endif %}
+        </div>
+
+        <!-- Action Buttons -->
+        <div style="margin-top: 30px; display: flex; gap: 10px;">
+            <a href="{{ url_for('dashboard') }}" class="btn btn-primary">Back to Dashboard</a>
+            <a href="{{ url_for('export_csv') }}" class="btn btn-outline">Export All Packages</a>
+        </div>
+
+        {% endif %}
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2024 GreenLoop - Reusable Packaging Tracking System</p>
+    </footer>
+
+    <script>
+        async function updateStatus(packageId) {
+            try {
+                const response = await fetch(`/package/${packageId}/update-status`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Reload the page to show updated status
+                    window.location.reload();
+                } else {
+                    alert('Error: ' + (data.error || 'Could not update status'));
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error updating package status');
+            }
+        }
+    </script>
+</body>
+</html>

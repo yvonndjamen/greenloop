@@ -1,0 +1,6 @@
+{
+  "demo": {
+    "username": "demo",
+    "password": "scrypt:32768:8:1$NVAJdkqgXKVH5qX7$52cc36da7baa4231b51a683e59f1c822cfaf213919db0689c2a350ed1f7017cfc55ed20ec86a6290fa012004eab6eb6dd437ee1ec5f149c51c8c770b32a8b730"
+  }
+}

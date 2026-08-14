@@ -1,0 +1,54 @@
+{
+  "PKG001": {
+    "id": "PKG001",
+    "created_at": "2026-06-01T10:00:00",
+    "history": [
+      {
+        "status": "shipped",
+        "timestamp": "2026-06-02T09:00:00"
+      },
+      {
+        "status": "returned",
+        "timestamp": "2026-06-05T17:13:59.226536"
+      }
+    ]
+  },
+  "PKG002": {
+    "id": "PKG002",
+    "created_at": "2026-06-01T10:00:00",
+    "history": [
+      {
+        "status": "shipped",
+        "timestamp": "2026-06-02T09:00:00"
+      },
+      {
+        "status": "returned",
+        "timestamp": "2026-06-10T15:30:00"
+      }
+    ]
+  },
+  "PKG003": {
+    "id": "PKG003",
+    "created_at": "2026-06-01T10:00:00",
+    "history": [
+      {
+        "status": "shipped",
+        "timestamp": "2026-06-02T09:00:00"
+      }
+    ]
+  },
+  "PKG004": {
+    "id": "PKG004",
+    "created_at": "2026-06-05T10:00:00",
+    "history": [
+      {
+        "status": "shipped",
+        "timestamp": "2026-06-05T17:14:48.774277"
+      },
+      {
+        "status": "returned",
+        "timestamp": "2026-06-05T17:15:00.708935"
+      }
+    ]
+  }
+}
