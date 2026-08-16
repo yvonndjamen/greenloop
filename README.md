@@ -9,53 +9,310 @@ customer, or returned), not a consumer-facing app and not a courier/driver app.
 Think "admin panel for the reusable packaging fleet", the same way a retailer
 already has an admin panel for orders or inventory.
 
-## Getting Started (Clone → Run → Explore the Demo)
+Getting Started with GreenLoop
 
-### 1. Clone the repository
-```bash
+This guide is written for users with no programming experience. Follow the steps in order. You do not need to understand the code to run or demonstrate the application.
+
+⸻
+
+Before You Start
+
+Before running GreenLoop, you need to install three things on your computer:
+
+* Git — used to download the GreenLoop project
+* Python — used to run the application
+* A web browser — Chrome, Edge, Firefox, etc.
+
+You only need to install these tools once.
+
+1. Install Git
+
+Go to the official Git website and download Git for your operating system:
+
+https://git-scm.com/downloads
+
+Install it using the default installation options.
+
+After installation, open Command Prompt (Windows) or Terminal (Mac/Linux).
+
+To check that Git was installed correctly, run:
+
+git --version
+
+You should see something similar to:
+
+git version 2.x.x
+
+If you see a version number, Git is ready.
+
+⸻
+
+2. Install Python
+
+Download Python from the official Python website:
+
+https://www.python.org/downloads/
+
+Install the latest Python 3 version.
+
+Important for Windows: During installation, make sure to check:
+
+Add Python to PATH
+
+before clicking Install Now.
+
+After installation, close and reopen Command Prompt.
+
+Check that Python is installed:
+
+python --version
+
+If that does not work on Windows, try:
+
+py --version
+
+You should see something similar to:
+
+Python 3.x.x
+
+⸻
+
+3. Check that Python’s package manager is available
+
+Python uses a tool called pip to install the libraries required by GreenLoop.
+
+Run:
+
+python -m pip --version
+
+You should see information about the installed pip version.
+
+If this works, your computer is ready to install GreenLoop.
+
+⸻
+
+Getting Started
+
+4. Clone the repository
+
+Open Command Prompt or Terminal.
+
+Choose the folder where you want to keep the project. For example, you can use your Desktop:
+
+cd Desktop
+
+Then download the GreenLoop project:
+
 git clone https://github.com/yvonndjamen/greenloop.git
+
+Move into the project folder:
+
 cd greenloop
-```
 
-### 2. Install dependencies
-```bash
-pip install -r requirements.txt
-```
+You should now be inside the GreenLoop project.
 
-### 3. Start the app locally
-```bash
-python3 app.py
-```
-The first run auto-creates `data/users.json` (demo user) and `data/packages.json`
-(a handful of sample packages) if they don't already exist, so there's nothing
-else to configure.
+⸻
 
-### 4. Open the dashboard
-Go to **http://localhost:5000** and log in with:
-- **Username:** demo
-- **Password:** demo123
+5. Create a virtual environment
 
-### 5. Explore the pre-loaded simulated packages
-The demo ships with sample packages (`PKG001`-`PKG004`) already in different
-states - some `in_circulation`, some `shipped`, some `returned` - so the
-dashboard KPIs, table, and CO₂ metric are populated immediately. Click any
-package in the table to open its lifecycle/timeline view at `/package/<id>`.
+A virtual environment keeps GreenLoop’s Python libraries separate from other programs on your computer.
 
-### 6. Add more simulated packages / advance their status
-No real device is needed - a "scan" is just a URL hit (see
-[Why We Simulate Instead of Using Real QR Codes or IoT Sensors](#why-we-simulate-instead-of-using-real-qr-codes-or-iot-sensors)
-below for why). From the package detail page, use the on-screen action button,
-or trigger it directly:
-```bash
-# Create a brand new package (any unused ID) and mark it shipped
+Run:
+
+python -m venv .venv
+
+This may take a few seconds.
+
+You only need to do this once.
+
+⸻
+
+6. Activate the virtual environment
+
+Windows
+
+Run:
+
+.venv\Scripts\activate
+
+After activation, you should see something similar to:
+
+(.venv) C:\Users\YourName\Desktop\greenloop>
+
+The (.venv) at the beginning means the environment is active.
+
+Mac/Linux
+
+Run:
+
+source .venv/bin/activate
+
+You should also see (.venv) at the beginning of the command line.
+
+⸻
+
+7. Install the required dependencies
+
+With the virtual environment activated, run:
+
+python -m pip install -r requirements.txt
+
+This installs all Python libraries required by GreenLoop.
+
+The installation may take a little while.
+
+You only need to do this the first time.
+
+⸻
+
+8. Start the application
+
+Once the dependencies have finished installing, run:
+
+python app.py
+
+You should see a message indicating that the application is running, for example:
+
+Running on http://127.0.0.1:5000
+
+Do not close this Command Prompt/Terminal window while you are using the application.
+
+The application is now running on your computer.
+
+⸻
+
+9. Open the GreenLoop dashboard
+
+Open your normal web browser and go to:
+
+http://localhost:5000
+
+You should see the GreenLoop login page.
+
+Use the demo account:
+
+* Username: demo
+* Password: demo123
+
+⸻
+
+10. Explore the pre-loaded simulated packages
+
+The demo automatically creates sample data the first time it runs.
+
+The application comes with sample packages:
+
+* PKG001
+* PKG002
+* PKG003
+* PKG004
+
+They are already in different states, such as:
+
+* in_circulation
+* shipped
+* returned
+
+This means the dashboard should already contain information when you log in.
+
+The KPIs, package table, and CO₂ metric should therefore be populated immediately.
+
+Click on any package in the table to open its lifecycle/timeline view:
+
+/package/<id>
+
+⸻
+
+11. Add more simulated packages / advance their status
+
+You do not need any real QR codes, scanners, IoT devices, or physical packages for the demo.
+
+GreenLoop simulates a package scan using a URL.
+
+From the package detail page, you can use the on-screen action button.
+
+You can also trigger a simulated scan directly from the terminal.
+
+For example, to create a new package and mark it as shipped:
+
 curl http://localhost:5000/scan/PKG010?action=shipped
 
-# Later, mark that same package as returned
-curl http://localhost:5000/scan/PKG010?action=returned
-```
-Refresh `/dashboard` afterwards to see the new package and updated metrics.
+Later, you can mark the same package as returned:
 
----
+curl http://localhost:5000/scan/PKG010?action=returned
+
+Then refresh the dashboard:
+
+http://localhost:5000/dashboard
+
+You should see the new package and updated metrics.
+
+⸻
+
+Quick Demo Flow
+
+For the school presentation, you can use this simple sequence:
+
+Before the presentation
+
+Make sure:
+
+* Git is installed
+* Python is installed
+* GreenLoop has been cloned
+* The virtual environment has been created
+* Dependencies have been installed
+
+On the day of the presentation
+
+Open Command Prompt/Terminal and go to the project:
+
+cd Desktop\greenloop
+
+Activate the environment:
+
+.venv\Scripts\activate
+
+Start the application:
+
+python app.py
+
+Then open:
+
+http://localhost:5000
+
+Log in with:
+
+Username: demo
+Password: demo123
+
+You can then demonstrate the dashboard, open a package, show its lifecycle, and simulate a package being shipped or returned.
+
+⸻
+
+Important
+
+When you are finished with the demo, go back to the Command Prompt/Terminal where the application is running and press:
+
+Ctrl + C
+
+This stops the GreenLoop application.
+
+You can start it again later by activating the virtual environment and running:
+
+python app.py
+
+⸻
+
+Why We Simulate Instead of Using Real QR Codes or IoT Sensors
+
+The GreenLoop demo does not require physical devices.
+
+A package “scan” is simulated by sending a request to the application, for example:
+
+curl http://localhost:5000/scan/PKG010?action=shipped
+
+This allows the complete package lifecycle to be demonstrated without requiring a real QR scanner, IoT sensor, or connected hardware.
 
 ## UI/UX Improvements
 
